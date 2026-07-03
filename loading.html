@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vanilla Ice Cream | Loading</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Playfair+Display:wght@700&display=swap');
+
+        :root {
+            --cream: #FFF8E1;
+            --vanilla: #F5E8C7;
+            --soft-pink: #FFB6C1;
+            --choco: #D2A679;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(135deg, #FFF8E1 0%, #F5E8C7 100%);
+            color: #3C2F2F;
+            position: relative;
+        }
+
+        /* Subtle ice cream texture background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.9) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(255, 182, 193, 0.15) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .logo {
+            width: 180px;
+            height: 180px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 90px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            margin-bottom: 20px;
+            border: 12px solid #FFF8E1;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .title {
+            font-family: 'Playfair Display', serif;
+            font-size: 4.5rem;
+            font-weight: 700;
+            color: #3C2F2F;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 1.4rem;
+            color: #5C4634;
+            margin-bottom: 40px;
+            letter-spacing: 3px;
+        }
+
+        .loading-container {
+            width: 420px;
+            margin: 30px 0;
+        }
+
+        .loading-bar {
+            height: 28px;
+            background: #FFF8E1;
+            border: 4px solid #3C2F2F;
+            border-radius: 9999px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #FFB6C1, #FF8FAB);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .progress::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0.4), transparent);
+            animation: shine 2s linear infinite;
+        }
+
+        .status {
+            margin-top: 12px;
+            font-size: 1.1rem;
+            color: #5C4634;
+            font-weight: 600;
+        }
+
+        .info {
+            position: absolute;
+            bottom: 40px;
+            display: flex;
+            gap: 60px;
+            font-size: 1.05rem;
+            color: #6B5747;
+        }
+
+        .tip {
+            max-width: 420px;
+            font-size: 1rem;
+            color: #6B5747;
+            font-style: italic;
+            margin-top: 30px;
+        }
+
+        .scoop {
+            position: absolute;
+            font-size: 4rem;
+            opacity: 0.15;
+            z-index: 0;
+            animation: drift 25s linear infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-150%); }
+            100% { transform: translateX(400%); }
+        }
+
+        @keyframes drift {
+            from { transform: translateY(100vh) rotate(0deg); }
+            to { transform: translateY(-100px) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating vanilla scoops -->
+    <div class="scoop" style="left: 8%; animation-delay: 0s;">🍦</div>
+    <div class="scoop" style="left: 22%; animation-delay: 4s;">🍨</div>
+    <div class="scoop" style="left: 65%; animation-delay: 9s;">🍦</div>
+    <div class="scoop" style="left: 82%; animation-delay: 2s;">🍨</div>
+
+    <div class="container">
+        <div class="logo">🍦</div>
+        
+        <h1 class="title">VANILLA</h1>
+        <p class="subtitle">100% PURE • NO ADDONS</p>
+
+        <div class="loading-container">
+            <div class="loading-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="status" id="status">Connecting to the freezer...</div>
+        </div>
+
+        <div class="tip">
+            "This server is 100% vanilla — just like real ice cream should be."
+        </div>
+
+        <div class="info">
+            <div><strong>Server:</strong> Vanilla Ice Cream</div>
+            <div><strong>Mode:</strong> Sandbox</div>
+        </div>
+    </div>
+
+    <script>
+        // Fake loading progress
+        let progress = 0;
+        const progressBar = document.getElementById('progress');
+        const statusText = document.getElementById('status');
+
+        const messages = [
+            "Scooping pure vanilla...",
+            "Churning the base...",
+            "No toppings allowed...",
+            "Keeping it 100% vanilla...",
+            "Loading creamy goodness...",
+            "Almost ready to serve..."
+        ];
+
+        let messageIndex = 0;
+
+        const loadingInterval = setInterval(() => {
+            progress += Math.random() * 12 + 4;
+            
+            if (progress > 100) progress = 100;
+            
+            progressBar.style.width = progress + '%';
+
+            if (progress > 25 && messageIndex === 0) {
+                statusText.textContent = messages[++messageIndex];
+            }
+            if (progress > 50 && messageIndex === 1) {
+                statusText.textContent = messages[++messageIndex];
+            }
+            if (progress > 75 && messageIndex === 2) {
+                statusText.textContent = messages[++messageIndex];
+            }
+
+            if (progress >= 100) {
+                clearInterval(loadingInterval);
+                statusText.textContent = "✅ Ready to play!";
+            }
+        }, 280);
+
+        // Optional: background music (uncomment if you want)
+        // const audio = new Audio('https://your-music-link.com/vanilla.mp3');
+        // audio.volume = 0.15;
+        // audio.play();
+    </script>
+</body>
+</html>
